@@ -1,0 +1,73 @@
+export const productSchema = {
+  type: 'object',
+  properties: {
+    productName: { type: 'string' },
+    price: { type: 'number', minimum: 1 },
+    category: {
+      type: 'string',
+      enum: ['Electronics', 'Apparel', 'Furniture']
+    },
+    details: {
+      type: 'object',
+      oneOf: [
+        {
+          properties: {
+            category: { const: 'Electronics' },
+            brand: { type: 'string' },
+            warranty: { type: 'string' }
+          },
+          required: ['brand', 'warranty']
+        },
+        {
+          properties: {
+            category: { const: 'Apparel' },
+            size: { type: 'string', enum: ['S', 'M', 'L', 'XL'] },
+            material: { type: 'string' }
+          },
+          required: ['size', 'material']
+        },
+        {
+          properties: {
+            category: { const: 'Furniture' },
+            dimensions: { type: 'string' },
+            weight: { type: 'number' }
+          },
+          required: ['dimensions', 'weight']
+        }
+      ]
+    }
+  },
+  required: ['productName', 'price', 'category']
+};
+
+
+export const productUiSchema = {
+  type: "VerticalLayout",
+  elements: [
+    {
+      type: "Control",
+      scope: "#/properties/productName",
+      label: "Product Name",
+    },
+    {
+      type: "Control",
+      scope: "#/properties/price",
+      label: "Price",
+    },
+    {
+      type: "Control",
+      scope: "#/properties/category",
+      label: "Category",
+    },
+    {
+      type: "Group",
+      label: "Category Specific Details",
+      elements: [
+        {
+          type: "Control",
+          scope: "#/properties/details",
+        },
+      ],
+    },
+  ],
+};
