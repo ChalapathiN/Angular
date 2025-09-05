@@ -1,0 +1,112 @@
+import { Component, OnInit, OnChanges, DoCheck, AfterContentInit,
+         AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy } from '@angular/core';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ChildComponent } from './child.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, ChildComponent],
+  templateUrl: './app.component.html',
+})
+export class AppComponent implements OnInit, OnChanges, DoCheck,
+    AfterContentInit, AfterContentChecked,
+    AfterViewInit, AfterViewChecked, OnDestroy {
+
+  form = new FormGroup({
+    productName: new FormControl('', Validators.required),
+    quantity: new FormControl(1, [Validators.required, Validators.min(1)]),
+    activeDate: new FormControl(new Date(), Validators.required),
+    price: new FormControl(0, [Validators.required, Validators.min(0)])
+  });
+  items: any[] = [];
+
+  ngOnInit() { console.log('Parent ngOnInit'); }
+  ngOnChanges() { console.log('Parent ngOnChanges'); }
+  ngDoCheck() { console.log('Parent ngDoCheck'); }
+  ngAfterContentInit() { console.log('Parent AfterContentInit'); }
+  ngAfterContentChecked() { console.log('Parent AfterContentChecked'); }
+  ngAfterViewInit() { console.log('Parent AfterViewInit'); }
+  ngAfterViewChecked() { console.log('Parent AfterViewChecked'); }
+  ngOnDestroy() { console.log('Parent OnDestroy'); }
+
+  onSubmit() {
+    if (this.form.valid) {
+      this.items.push(this.form.value);
+      this.form.reset({ productName: '', quantity: 1, activeDate: new Date(), price: 0 }, { emitEvent: false });
+    }
+  }
+}
+
+
+--------------------------
+<div class="container mt-4">
+  <h2>Product Form (Parent)</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label>Product Name</label>
+      <input class="form-control" formControlName="productName">
+    </div>
+    <div class="mb-3">
+      <label>Quantity</label>
+      <input type="number" class="form-control" formControlName="quantity">
+    </div>
+    <div class="mb-3">
+      <label>Active Date</label>
+      <input type="date" class="form-control" formControlName="activeDate">
+    </div>
+    <div class="mb-3">
+      <label>Price</label>
+      <input type="number" class="form-control" formControlName="price">
+    </div>
+    <button class="btn btn-primary" type="submit" [disabled]="form.invalid">Add Product</button>
+  </form>
+
+  <hr>
+  <app-child [items]="items"></app-child>
+</div>
+
+
+------------------
+import { Component, Input, OnInit, OnChanges, DoCheck,
+         AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-child',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="mt-4">
+      <h3>Product List (Child)</h3>
+      @if (items.length > 0) {
+        <ul class="list-group">
+          @for (let item of items; track item.productName) {
+            <li class="list-group-item d-flex justify-content-between">
+              <span>{{ item.productName }} (Qty: {{ item.quantity }})</span>
+              <span>Price: ₹{{ item.price }} — Date: {{ item.activeDate | date }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p>No products added yet.</p>
+      }
+    </div>
+  `
+})
+export class ChildComponent implements OnInit, OnChanges, DoCheck,
+    AfterContentInit, AfterContentChecked,
+    AfterViewInit, AfterViewChecked, OnDestroy {
+
+  @Input() items: any[] = [];
+
+  ngOnInit() { console.log('Child ngOnInit'); }
+  ngOnChanges() { console.log('Child ngOnChanges'); }
+  ngDoCheck() { console.log('Child ngDoCheck'); }
+  ngAfterContentInit() { console.log('Child AfterContentInit'); }
+  ngAfterContentChecked() { console.log('Child AfterContentChecked'); }
+  ngAfterViewInit() { console.log('Child AfterViewInit'); }
+  ngAfterViewChecked() { console.log('Child AfterViewChecked'); }
+  ngOnDestroy() { console.log('Child OnDestroy'); }
+}
